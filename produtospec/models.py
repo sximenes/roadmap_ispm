@@ -86,6 +86,9 @@ class FeatureValue(models.Model):
     value = models.CharField(max_length=200)
     feature = models.ForeignKey('Feature')
     product = models.ForeignKey('Product')
+    
+    class Meta:
+        unique_together = ('feature', 'product',)
 
     def __unicode__(self):
         return '%s-%s-%s' % (self.feature, self.product, self.value)
