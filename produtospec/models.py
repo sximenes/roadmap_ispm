@@ -1,5 +1,6 @@
 from django.db import models
 
+__all___ = ['Product', 'ProductSpec', 'Feature', 'FeatureValue']
 
 class Product(models.Model):
     '''
