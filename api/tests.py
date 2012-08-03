@@ -18,8 +18,14 @@ class HandlerTestCase(unittest.TestCase):
 
     def test_create_product(self):
     '''
-    Testando a criacao de um product com base no json recebido
+    Testando a criacao de um product com base no json recebido.
+
+    O dicionario contendo os produtos precisa ser valido, caso exista
+    algum erro no dicionario, o metodo deve tratar isso e retornar um codigo
+    de erro correspondente ao problema.
+
     '''
+
     product_dict = {
             'name': 'Camiseta Mega Boga',
             'product_spec': {'name': 'Camiseta'},
@@ -29,5 +35,6 @@ class HandlerTestCase(unittest.TestCase):
     
     self.assertIsNotNone(product_json)
     
-    product = self.client.post('/api/product/create/', product_json)
-    self.assertIsInstance(product, Product)
+    resp = self.client.post('/api/product/create/', product_json)
+    #self.assertIsInstance(product, Product)
+    sellf.assertEqual(resp.status_code, 200)
