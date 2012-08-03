@@ -35,7 +35,7 @@ class HandlerTestCase(unittest.TestCase):
     
     self.assertIsNotNone(product_json)
     
-    resp = self.client.post('/api/product/create/', product_json)
-    #self.assertIsInstance(product, Product)
-    self.assertEqual(resp.status_code, 200)
+    product_handler = ProductHandler()
+    product = product_handler.create(product_json)
+    self.assertIsInstance(product, Product)
 
