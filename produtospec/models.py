@@ -16,13 +16,24 @@ class Product(models.Model):
 
     def feature_is_valid(self, feature):
         '''
-        Recebe uma feature e verifica se o product_spec do produto e o mesmo
-        da feature passada
+        Recebe uma feature e verifica se o product_spec do produto 
+        e o mesmo da feature passada
         '''
-        valid_features = Feature.objects.filter(product_spec=self.product_spec)
+        valid_features = Feature.objects.filter(
+            product_spec=self.product_spec)
         if feature.product_spec != self.product_spec:
             return False
         return True
+
+    #def create_by_json(self, product_dict):
+    #'''
+    #Recebe um dicionario contendo as informacoes do produto e
+    #crua um product com as informacoes, desde que elas sejam validas.
+    #Retorna uma instancia de product em caso de sucesso ou 
+    #None em caso de falha.
+    #'''
+    #if not product_dict:
+    #    return False
 
 
 class ProductSpec(models.Model):
@@ -33,7 +44,7 @@ class ProductSpec(models.Model):
             'camiseta'
         }
     ''' 
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
  
 
 class Feature(models.Model):
@@ -53,7 +64,8 @@ class Feature(models.Model):
 
 class FeatureValue(models.Model):
     '''
-    Classe que define o valor de uma determinada caracteristica de produto em um produto especifico
+    Classe que define o valor de uma determinada caracteristica 
+    de produto.
     ex.
         {
             'Vermelho',
@@ -61,7 +73,7 @@ class FeatureValue(models.Model):
             <<Camiseta MegaBoga>>
         }
     
-    obs. As features escolhidas devem pertencer ao grupo de features do produto_spec do produto
+    obs. O product_spec da feature deve ser igual ao do produto escolhido.
     '''
     value = models.CharField(max_length=200)
     feature = models.ForeignKey('Feature')
