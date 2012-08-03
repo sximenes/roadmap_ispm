@@ -25,6 +25,9 @@ class Product(models.Model):
             return False
         return True
 
+    def __unicode__(self):
+        return self.name
+    
     #def create_by_json(self, product_dict):
     #'''
     #Recebe um dicionario contendo as informacoes do produto e
@@ -45,7 +48,10 @@ class ProductSpec(models.Model):
         }
     ''' 
     name = models.CharField(max_length=200, unique=True)
- 
+
+    def __unicode__(self):
+        return self.name
+     
 
 class Feature(models.Model):
     '''
@@ -61,6 +67,8 @@ class Feature(models.Model):
     description = models.TextField()
     product_spec = models.ForeignKey('ProductSpec')
 
+    def __unicode__(self):
+        return self.name
 
 class FeatureValue(models.Model):
     '''
@@ -79,3 +87,5 @@ class FeatureValue(models.Model):
     feature = models.ForeignKey('Feature')
     product = models.ForeignKey('Product')
 
+    def __unicode__(self):
+        return '%s-%s-%s' % (self.feature, self.product, self.value)
