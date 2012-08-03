@@ -37,4 +37,5 @@ class HandlerTestCase(unittest.TestCase):
     
     resp = self.client.post('/api/product/create/', product_json)
     #self.assertIsInstance(product, Product)
-    sellf.assertEqual(resp.status_code, 200)
+    self.assertEqual(resp.status_code, 200)
+
