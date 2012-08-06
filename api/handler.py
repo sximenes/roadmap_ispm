@@ -1,9 +1,11 @@
 import re
-from django.core.paginator import Paginator
-from django.utils import simplejson
-from piston.handler import BaseHandler
 
-from produtospec.models import Product, ProductSpec
+from django.core.paginator import Paginator
+
+from piston.handler import BaseHandler
+from piston.utils import rc, require_mime
+
+from produtospec.models import *
 
 
 class ProductHandler(BaseHandler):
@@ -11,23 +13,24 @@ class ProductHandler(BaseHandler):
     model = Product
     fields = ('name', 'price', 
     ('product_spec', ('name',)))
-    exclude = ('id', re.compile(r'^private_'))
 
-    def read(self, request, *arga, **kwargs):
+    def read(self, request, page=1, id=None):
         '''
-        Retorna um json com uma lista de products paginados,
-        o metodo espera uma inteiro que vai derterminar em 
-        que paqina esta sendo consultada.
-        Retorna uma lista de QuerySets ou None em caso de falha
+        Pode receber uma pagina e um id de product, caso, nao
+        receba nenhum id de product, sera retornado todos os product.
         '''
-        page = kwargs.get('page', 1) 
-        objects_list = Project.objects.all()
-        objects_paginator = Paginator(objects_list)
-
-        products_list = objects_paginator.page(page)
+        if not id:
+            objects_list = Product.objects.all()
+            objects_paginator = Paginator(objects_list)
+            products_list = objects_paginator.page(page)
         
-        #@TODO: Ver como retornar json
-        return simplejson.dumps(products_list)
+            return products_list
+        else:
+            try:
+                product = Product.objects.get(id=id)
+            except Product.DoesNotExist:
+                return rc.NOT_FOUND
+            return product
 
     @require_mime('json',)
     def create(self, request, *args, **kwargs):
@@ -48,13 +51,18 @@ class ProductHandler(BaseHandler):
                         }
                     }
         '''
-        product_dict = simplejson.load(request.POST.get('product', None))
+        product_dict = self.flatten_dict(request.POST)
+        
+        if self.exists(**product_dict):
+            return rc.DUPLICATE_ENTRY
+
         if not product_dict:
-            return None
+            return rc.BAD_REQUEST
+
         p_spec = product_dict.get('product_spec')
         name_product_spec = p_spec.get('name')
         if not name_product_spec:
-            return None
+            return rc.BAD_REQUEST
 
         product_spec, created = ProductSpec.objects.get_or_create(
             name=name_product_spec, defaults={'name': name_product_spec})
@@ -66,18 +74,20 @@ class ProductHandler(BaseHandler):
         
         #criando os Features e Features values para o product_spec
         features_list = p_spec.get('features')
-        
+        if not feature_list:
+            return rc.BAD_REQUEST
         #separando as features validas e nao validas
         list_invalid_features = []
         list_valid_features = []
-
+        
         for feature_dict in features_list:
             #validando as features
 
             name_feature = feature_dict.get('name')
             description_feature = feature_dict.get('description')
 
-            feature, created = Feature.objects.get_or_create(name=name_feature, product_spec=product_spec, 
+            feature, created = Feature.objects.get_or_create(
+                name=name_feature, product_spec=product_spec, 
                 defaults={
                     'name': name_feature,
                     'description': description_feature,
@@ -94,7 +104,8 @@ class ProductHandler(BaseHandler):
                 #atualizando o  value do feature para esse product
                 for feature_value_dict in feture_dict.get('features_values', []):
                     value = dict_feature_value.get('value')
-                    feature_value, created = FeatureValue.objects.get_or_create(feature=feature, product=product,
+                    feature_value, created = FeatureValue.objects.get_or_create(
+                        feature=feature, product=product,
                         defaults={
                             'value': value,
                             'feature': feature,
@@ -102,6 +113,8 @@ class ProductHandler(BaseHandler):
                     if not created:
                         feature_value.value = value
                         feature_value.save()
+        
+        return product
 
 
 #class ProductSpecHandler(BaseHandler):

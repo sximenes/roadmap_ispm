@@ -79,6 +79,6 @@ class ProductTestCase(unittest.TestCase):
         assert feature02 is not None
 
         self.assertTrue(product01.feature_is_valid(feature01))
-        self.assertTrue(product01.feature_is_valid(feature02))
+        self.assertFalse(product01.feature_is_valid(feature02))
                
 
