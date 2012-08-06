@@ -3,7 +3,7 @@ import unittest
 from django.utils import simplejson
 from piston.utils import rc
 #project
-from produtospecmodels import Product
+from produtospec.models import Product
 from api.handler import *
 
 
@@ -13,11 +13,11 @@ class HandlerTestCase(unittest.TestCase):
     '''
 
     def test_create_method(self):
-       '''
-       Testando se o retorno do metodo create e um instancia da classe
-       Product
-       '''
-       product_list = {
+        '''
+        Testando se o retorno do metodo create e um instancia da classe
+        Product
+        '''
+        product_dict = {
            'name': 'Camiseta Mega Boga',
            'price': '20.30',
            'product_spec': [
@@ -31,10 +31,9 @@ class HandlerTestCase(unittest.TestCase):
                         {'value': 'Laranja'},]
                     }]
                 },]}
-
         handler = ProductHandler()
         #verificando se o retorno e do tipo Product
-        self.assertIsInstance(product_dict, Product)
+        self.assertIsInstance(handler.create(product_dict), Product)
     
     def test_bad_request(self):
         '''

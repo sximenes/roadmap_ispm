@@ -70,7 +70,7 @@ class ProductTestCase(unittest.TestCase):
         lista de features do produto_spec.
         '''
         
-        product01 = Product.objects.get(pk=2)
+        product01 = Product.objects.get(pk=1)
         feature01 = Feature.objects.get(pk=1)
         feature02 = Feature.objects.get(pk=2)
 
