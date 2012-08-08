@@ -1,5 +1,7 @@
-#django
+#python
 import unittest
+from mock import Mock
+#django
 from django.utils import simplejson
 from piston.utils import rc
 #project
@@ -12,28 +14,32 @@ class HandlerTestCase(unittest.TestCase):
     Conter todos os testes da api
     '''
 
-    def test_create_method(self):
+    def test_create(self):
         '''
-        Testando se o retorno do metodo create e um instancia da classe
-        Product
+        Testando se o retorno do metodo create e igual ao codigo
+        rc.CREATED do piston
         '''
-        product_dict = {
+        product_json = [{
            'name': 'Camiseta Mega Boga',
            'price': '20.30',
-           'product_spec': [
-                {
+           'product_spec': {
                     'name': 'Camiseta',
-                    'features': [
-                    {
+                    'features': [{
                         'name': 'Cor',
                         'description': 'Produto com varias cores',
-                        'feature_value': [{'value': 'Verde'},
-                        {'value': 'Laranja'},]
-                    }]
-                },]}
+                        'feature_value': [
+                            {'value': 'Verde'},
+                            {'value': 'Laranja'},]
+                        }]
+                    }}]
+
         handler = ProductHandler()
-        #verificando se o retorno e do tipo Product
-        self.assertIsInstance(handler.create(product_dict), Product)
+        request = Mock()
+        request.META.return_value = {'CONTENT_TYPE': 'application/json'}
+        request.content_type.return_value = 'aplication/json'
+        request.data.return_value = product_json
+        resp = handler.create(request)
+        self.assertEqual(resp.content, rc.CREATED.content)
     
     def test_bad_request(self):
         '''
@@ -41,17 +47,35 @@ class HandlerTestCase(unittest.TestCase):
         um dicionario invalido, o retorno deve ser o codigo para 
         BAD_REQUEST
         '''
-        product_list = {
+        product_json = [{
             'name': 'Camiseta Mega Boga',
             'price': '20.30',
-            'product_spec': [
+            'product_spec':
                 {
                     'name': 'Camiseta',
                     'features': []
-                },]}
+                }}]
         
         handler = ProductHandler()
+        request = Mock()
+        request.META.return_value = {'CONTENT_TYPE': 'application/json'}
+        request.content_type.return_value = 'application/json'
+        request.data.return_value = simplejson.loads(product_json)
+
         #verificando se ao passar os parametros errados
         #retorna o codigo de erro correto.
-        self.assertEqual(handler.create(product_dict), rc.BAD_REQUEST)
+        resp = handler.create(request)
+        self.assertEqual(
+            resp.content, rc.BAD_REQUEST.content)
+
+    #def test_duplicated_product(self):
+    #    '''
+    #    Testa se o argumento for um dicionario contendo um product
+    #    ja cadastrado se o retorno vai ser o rc.DUPLICATE_ENTRY
+    #    '''
+    #    
+    #    product = Product.objects.get(pk=1)
+        
+
+
 

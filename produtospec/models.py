@@ -2,6 +2,7 @@ from django.db import models
 
 __all___ = ['Product', 'ProductSpec', 'Feature', 'FeatureValue']
 
+
 class Product(models.Model):
     '''
     Classe que define um produto.
@@ -13,7 +14,7 @@ class Product(models.Model):
     '''
     name = models.CharField(max_length=200)
     price = models.DecimalField(max_digits=5, decimal_places=2)
-    product_spec = models.ForeignKey('ProductSpec')
+    product_spec = models.ForeignKey('ProductSpec', related_name='products')
 
     def feature_is_valid(self, feature):
         '''
@@ -29,15 +30,6 @@ class Product(models.Model):
     def __unicode__(self):
         return self.name
     
-    #def create_by_json(self, product_dict):
-    #'''
-    #Recebe um dicionario contendo as informacoes do produto e
-    #crua um product com as informacoes, desde que elas sejam validas.
-    #Retorna uma instancia de product em caso de sucesso ou 
-    #None em caso de falha.
-    #'''
-    #if not product_dict:
-    #    return False
 
 
 class ProductSpec(models.Model):
@@ -54,6 +46,7 @@ class ProductSpec(models.Model):
         return self.name
      
 
+
 class Feature(models.Model):
     '''
     Classe que define uma caracteristica de uma especificacao de produto
@@ -66,10 +59,11 @@ class Feature(models.Model):
     '''
     name = models.CharField(max_length=200)
     description = models.TextField()
-    product_spec = models.ForeignKey('ProductSpec')
+    product_spec = models.ForeignKey('ProductSpec', related_name='features')
 
     def __unicode__(self):
         return self.name
+
 
 class FeatureValue(models.Model):
     '''
@@ -85,11 +79,12 @@ class FeatureValue(models.Model):
     obs. O product_spec da feature deve ser igual ao do produto escolhido.
     '''
     value = models.CharField(max_length=200)
-    feature = models.ForeignKey('Feature')
-    product = models.ForeignKey('Product')
+    feature = models.ForeignKey('Feature', related_name='features_values')
+    product = models.ForeignKey('Product', related_name='features_values')
     
     class Meta:
         unique_together = ('feature', 'product',)
 
     def __unicode__(self):
         return '%s-%s-%s' % (self.feature, self.product, self.value)
+
