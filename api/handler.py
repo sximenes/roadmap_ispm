@@ -47,33 +47,33 @@ class ProductHandler(BaseHandler):
         '''
         Cria um product com base em um json recebido,
         o json deve conter a seguinte estrutura:
-            obj = {
-                    'name': 'Camiseta MegaBoga',
-                    'price': '21.31',
-                    'product_spec': {
-                        'name': '',
-                        'features': [
-                            {
-                                'name': 'Cor',
-                                'description': 'Alguma coisa',
-                                'features_values': [value: 'Verde'},]
-                            },],
-                        }
-                    }
+            [{
+                'name': 'Camiseta MegaBoga',
+                'price': '21.31',
+                'product_spec': {
+                    'name': '',
+                    'features': [
+                        {
+                            'name': 'Cor',
+                            'description': 'Alguma coisa',
+                            'features_values': [value: 'Verde'},]
+                        },],
+            }]
         '''
 
         if not request.content_type:
-            super(ExpressiveTestModel, self).create(request)
+            super(ProductHandler, self).create(request)
         
         product_dict = request.data
-        if self.exists(**product_dict):
-            return rc.DUPLICATE_ENTRY
+        #if self.exists(**product_dict):
+        #    return rc.DUPLICATE_ENTRY
 
         if not product_dict:
             return rc.BAD_REQUEST
 
         p_spec = product_dict.get('product_spec')
         name_product_spec = p_spec.get('name')
+        
         if not name_product_spec:
             return rc.BAD_REQUEST
 
@@ -86,10 +86,15 @@ class ProductHandler(BaseHandler):
             price=product_dict.get('price'),
             product_spec=product_spec)
         
+        if not product:
+            return rc.BAD_REQUEST
+        
         #criando os Features e Features values para o product_spec
         features_list = p_spec.get('features')
+        
         if not features_list:
             return rc.BAD_REQUEST
+        
         #separando as features validas e nao validas
         for feature_dict in features_list:
             #validando as features
@@ -124,10 +129,7 @@ class ProductHandler(BaseHandler):
                     if not created:
                         feature_value.value = value
                         feature_value.save()
-        if not product: 
-            return rc.BAD_REQUEST
-        else:
-            return rc.CREATED
+        return rc.CREATED
 
 
 #class ProductSpecHandler(BaseHandler):
