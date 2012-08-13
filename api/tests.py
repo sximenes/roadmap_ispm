@@ -54,7 +54,7 @@ class HandlerProductSpecTestCase(unittest.TestCase):
         self.assertTrue(objects_mock.all.called)
         self.assertFalse(objects_mock.get.called)
 
-    @mock.path(ProductSpec)
+    @mock.patch('produtospec.models.ProductSpec')
     def test_create(self, ProductSpecMock):
         pass
 

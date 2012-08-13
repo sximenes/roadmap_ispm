@@ -42,18 +42,9 @@ class ProductSpecHandler(BaseHandler):
 class ProductHandler(BaseHandler):
     allowed_methods = ('GET', 'POST')
     model = Product
-    fields = (
-        'name', 'price',
-        ('product_spec',
-            ('name',
-                ('features',
-                    ('name',
-                        'description',
-                        ('feature_values', ('value', ))
-                    )
-                )
-            ),
-        )
+    fields = ('name', 'price', ('product_spec', 'name',\
+        ('features', ('name', 'description',
+            ('feature_values', ('value', )))), ))
 
     def read(self, request):
         '''
@@ -151,12 +142,14 @@ class ProductHandler(BaseHandler):
                     'features_values', []):
                     value = dict_feature_value.get('value')
                     base = FeatureValue.objects
-                        feature_value, created = base.get_or_create(
+                    feature_value, created = base.get_or_create(
                         feature=feature, product=product,
                         defaults={
                             'value': value,
                             'feature': feature,
-                            'product': product})
+                            'product': product
+                        }
+                    )
                     if not created:
                         feature_value.value = value
                         feature_value.save()
