@@ -17,10 +17,9 @@ class Product(models.Model):
     product_spec = models.ForeignKey('ProductSpec', related_name='products')
 
     def feature_is_valid(self, feature):
-        '''
-        Recebe uma feature e verifica se o product_spec do produto 
-        e o mesmo da feature passada
-        '''
+        '''Recebe uma feature e verifica se o product_spec do produto
+        e o mesmo da feature passada'''
+
         valid_features = Feature.objects.filter(
             product_spec=self.product_spec)
         if feature.product_spec != self.product_spec:
@@ -29,7 +28,6 @@ class Product(models.Model):
 
     def __unicode__(self):
         return self.name
-    
 
 
 class ProductSpec(models.Model):
@@ -39,12 +37,11 @@ class ProductSpec(models.Model):
         {
             'camiseta'
         }
-    ''' 
+    '''
     name = models.CharField(max_length=200, unique=True)
 
     def __unicode__(self):
         return self.name
-     
 
 
 class Feature(models.Model):
@@ -67,7 +64,7 @@ class Feature(models.Model):
 
 class FeatureValue(models.Model):
     '''
-    Classe que define o valor de uma determinada caracteristica 
+    Classe que define o valor de uma determinada caracteristica
     de produto.
     ex.
         {
@@ -75,16 +72,14 @@ class FeatureValue(models.Model):
             <<cor>>,
             <<Camiseta MegaBoga>>
         }
-    
     obs. O product_spec da feature deve ser igual ao do produto escolhido.
     '''
     value = models.CharField(max_length=200)
     feature = models.ForeignKey('Feature', related_name='features_values')
     product = models.ForeignKey('Product', related_name='features_values')
-    
+
     class Meta:
         unique_together = ('feature', 'product',)
 
     def __unicode__(self):
         return '%s-%s-%s' % (self.feature, self.product, self.value)
-

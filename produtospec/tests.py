@@ -17,59 +17,57 @@ class ProductTestCase(unittest.TestCase):
         Testando a criao dos objetos com o metodo create do django.
         '''
         product_spec01 = ProductSpec.objects.create(
-            name = 'Camiseta')
+            name='Camiseta')
         product_spec02 = ProductSpec.objects.create(
-            name= 'Caixas')
+            name='Caixas')
 
         assert product_spec01 is not None
         assert product_spec02 is not None
 
         product01 = Product.objects.create(
-            name = 'MegaBoga',
-            price = Decimal('23.20'),
-            product_spec = product_spec01)
-        
+            name='MegaBoga',
+            price=Decimal('23.20'),
+            product_spec=product_spec01)
+
         product02 = Product.objects.create(
-            name = 'Caixa Vazia',
-            price = '0.00',
-            product_spec = product_spec02)
+            name='Caixa Vazia',
+            price='0.00',
+            product_spec=product_spec02)
 
         assert product01 is not None
         assert product02 is not None
 
         feature01 = Feature.objects.create(
-            name = 'Cor',
-            description = 'Define a cor do produto',
-            product_spec = product_spec01)
-    
+            name='Cor',
+            description='Define a cor do produto',
+            product_spec=product_spec01)
+
         feature02 = Feature.objects.create(
             name='Peso',
-            description = 'Define o peso do produto',
-            product_spec = product_spec02)
+            description='Define o peso do produto',
+            product_spec=product_spec02)
 
         assert feature01 is not None
-        assert feature02 is not None        
+        assert feature02 is not None
 
         feature_value01 = FeatureValue.objects.create(
-            value = 'Vermelho',
-            feature = feature01,
-            product = product01)
-        
+            value='Vermelho',
+            feature=feature01,
+            product=product01)
         feature_value02 = FeatureValue.objects.create(
-            value = '20kg',
-            feature = feature02,
-            product = product02)
+            value='20kg',
+            feature=feature02,
+            product=product02)
 
         assert feature_value01 is not None
         assert feature_value02 is not None
 
-
     def test_product_feature(self):
         '''
-        As features_values definidos  para um produto devem pertencer a 
+        As features_values definidos  para um produto devem pertencer a
         lista de features do produto_spec.
         '''
-        
+
         product01 = Product.objects.get(pk=1)
         feature01 = Feature.objects.get(pk=1)
         feature02 = Feature.objects.get(pk=2)
@@ -80,5 +78,3 @@ class ProductTestCase(unittest.TestCase):
 
         self.assertTrue(product01.feature_is_valid(feature01))
         self.assertFalse(product01.feature_is_valid(feature02))
-               
-
